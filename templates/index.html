@@ -2,21 +2,35 @@
 <html>
     <head>
         <title>CMX Flight Status</title>\
-        <link rel="stylesheet" href=""/static/css/style.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        
+>
     </head>
     <body>
         <h1>CMX Airport Live Status</h1>
 
         <h2>Flights</h2>
-        <pre id="flights">loading flights...</pre>
+        <div id="flights">loading flights...</div>
+        <script src="flights.js"></script>
+        <script> window.addEventListener("DOMContentLoaded", load_flights); </script>
 
         <h2>Weather</h2>
         <div id="weather">loading weather...</div>
 
-        <h2>Airport Webcam</h2>
-        <img id=""webcam" src="https://www.michigan.gov/mdot/-/media/Project-Webcams/CMX_cam.jpg" width="640">
 
-        <script src="/static/js/main.js"></script>
+        <h2>Airport Webcam</h2>
+        <div id="webcam"></div>
+        <h3>Airport Webcam</h3>
+        <iframe 
+            src="https://www.houghtoncounty.org/" 
+            width="600" 
+            height="400" 
+            style="border:1px solid #ccc;" 
+            title="Houghton County Airport Webcam">
+        </iframe>
+`;
+</script>
+        <script src="{{ url_for('static', filename='js/main.js') }}"></script>
         
 
 

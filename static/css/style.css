@@ -1,25 +1,79 @@
+/* ===== Global Colors ===== */
+:root {
+    --mtu-gold: #ffcd00;
+    --mtu-black: #000000;
+    --mtu-gray: #1a1a1a;
+    --mtu-white: #ffffff;
+}
+
+/* ===== Page Background ===== */
 body {
-    font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-    background-color: black;
-    padding: 30px;
-}
-
-h1, h2 {
-    color: yellow;
-}
-
-#flights, #weather {
-    background: black;
-    padding: 20px;
-    border-radius: 5px;
-    white-space: pre-wrap;
+    background: var(--mtu-black);
+    color: var(--mtu-gold);
     font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+}
 
-#webcam {
-    border:0cap 2px;
-    border-radius: 5px;
-    display: block;
+/* ===== Header ===== */
+header {
+    background: var(--mtu-gold);
+    color: var(--mtu-black);
+    padding: 20px;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* ===== Section Cards ===== */
+.section {
+    background: var(--mtu-gray);
+    border-left: 6px solid var(--mtu-gold);
+    margin: 20px auto;
+    padding: 20px;
+    width: 80%;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(255, 205, 0, 0.3);
+}
+
+/* ===== Section Titles ===== */
+.section h2 {
+    color: var(--mtu-gold);
+    margin-bottom: 10px;
+}
+
+/* ===== Flight + Weather Tables ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
     margin-top: 10px;
+}
 
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #333;
 }
+
+th {
+    background: var(--mtu-gold);
+    color: var(--mtu-black);
+    font-weight: bold;
 }
+
+td {
+    color: var(--mtu-white);
+}
+
+/* ===== Webcam Image ===== */
+.webcam img {
+    width: 100%;
+    border: 4px solid var(--mtu-gold);
+    border-radius: 6px;
+}
+
+
+
+
+
+
