@@ -1,0 +1,25 @@
+body {
+    font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    background-color: black;
+    padding: 30px;
+}
+
+h1, h2 {
+    color: yellow;
+}
+
+#flights, #weather {
+    background: black;
+    padding: 20px;
+    border-radius: 5px;
+    white-space: pre-wrap;
+    font-family: Arial, Helvetica, sans-serif;
+
+#webcam {
+    border:0cap 2px;
+    border-radius: 5px;
+    display: block;
+    margin-top: 10px;
+
+}
+}
