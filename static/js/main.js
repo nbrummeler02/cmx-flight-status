@@ -1,21 +1,39 @@
 // Load flight data safely
-async function load_flights() {
+// options: {iata, flight, date, local}
+async function load_flights(options = {}) {
     try {
-        const res = await fetch("/flights");
-        const data = await res.json();
+        // Normalize user input for query params.
+        const iata = (options.iata || 'CMX').trim().toUpperCase();
+        const flight = (options.flight || '').trim().toUpperCase();
+        const date = options.date || '';
+        const local = options.local ? 'true' : '';
+
+        // the query string is passed as request args to the Flask endpoint
+        const baseParams = new URLSearchParams({ iata });
+        if (flight) baseParams.set('flight', flight);
+        if (date) baseParams.set('date', date);
+        if (local) baseParams.set('local', local);
+
+        // Fetch both arrival+departure versions concurrently.
+        const [arrRes, depRes] = await Promise.all([
+            fetch(`/flights?type=arrival&${baseParams.toString()}`),
+            fetch(`/flights?type=departure&${baseParams.toString()}`)
+        ]);
+
+        const [arrData, depData] = await Promise.all([arrRes.json(), depRes.json()]);
+
+        const arrivals = Array.isArray(arrData.data) ? arrData.data.slice(0, 2) : [];
+        const departures = Array.isArray(depData.data) ? depData.data.slice(0, 2) : [];
 
         const container = document.getElementById("flights");
         container.innerHTML = ""; // Clear previous content
 
-        if (!data.data || data.data.length === 0) {
+        if (arrivals.length === 0 && departures.length === 0) {
             container.innerHTML = "<p>No flight data available.</p>";
             return;
         }
 
-        // Filter arrivals and departures, limit to 2 each
-        const arrivals = data.data.filter(f => f.arrival).slice(0, 2);
-        const departures = data.data.filter(f => f.departure).slice(0, 2);
-
+        // Helper to produce DOM elements for a flight row.
         function create_flight_element(flight, type) {
             const dep = flight.departure || {};
             const arr = flight.arrival || {};
@@ -82,34 +100,42 @@ async function load_weather() {
         console.log("Weather data:", data); // check the browser console
 
         const container = document.getElementById("weather");
-        container.innerHTML = `
-            <strong>${data.name || "Unknown location"}</strong><br>
-            Temperature: ${data.main?.temp ?? "N/A"}°F<br>
-            Condition: ${data.weather?.[0]?.description ?? "N/A"}<br>
-            Humidity: ${data.main?.humidity ?? "N/A"}%<br>
-            Wind: ${data.wind?.speed ?? "N/A"} m/s
-        `;
+        if (data.current) {
+            container.innerHTML = `
+                <strong>${data.city || "Unknown location"}</strong><br>
+                Current: ${data.current.temp}°F<br>
+                Condition: ${data.current.description}<br>
+                Humidity: ${data.current.humidity}%<br>
+                Wind: ${data.current.wind_speed} m/s
+            `;
+        } else {
+            container.innerHTML = "<p>No current weather available.</p>";
+        }
+
+        // Render forecast if available
+        const forecastContainer = document.getElementById("forecast");
+        if (data.forecast && data.forecast.length > 0) {
+            forecastContainer.innerHTML = data.forecast.map(day => `
+                <div class="forecast-day">
+                    <strong>${new Date(day.date).toLocaleDateString()}</strong><br>
+                    ${day.temp_min}° / ${day.temp_max}°F<br>
+                    ${day.description}<br>
+                    <img src="http://openweathermap.org/img/wn/${day.icon}.png" alt="${day.description}">
+                </div>
+            `).join("");
+        } else {
+            forecastContainer.innerHTML = "<p>No forecast available.</p>";
+        }
     } catch (err) {
         console.error("Error loading weather:", err);
         document.getElementById("weather").innerHTML = "<p>Failed to load weather data.</p>";
+        document.getElementById("forecast").innerHTML = "<p>Failed to load forecast.</p>";
     }
 }
 
-// call it on page load
-window.addEventListener("DOMContentLoaded", load_weather);
+window.addEventListener("DOMContentLoaded", () => {
+    load_weather();
+});
 
-
-//load and refresh webcam (every 30 seconds)
-function refresh_cam() {
-    const cam = document.getElementById("webcam")
-    cam.src = "https://www.michigan.gov/mdot/-/media/Project-Webcams/CMX_cam.jpg" + new Date().getTime();
-}
-
-load_flights();
-load_weather();
-refresh_cam();
-//refresh every 60 seconds
-setInterval(load_flights, 60000);
+// refresh weather every 60 seconds (flight auto-refresh is handled in index search UI)
 setInterval(load_weather, 60000);
-//refresh every 30 seconds 
-setInterval(refresh_cam, 30000)

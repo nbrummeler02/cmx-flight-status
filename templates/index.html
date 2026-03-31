@@ -1,35 +1,68 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>CMX Flight Status</title>\
+        <title>CMX Flight Status</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-        
->
     </head>
     <body>
         <h1>CMX Airport Live Status</h1>
 
         <h2>Flights</h2>
+        <div>
+            <!-- Airport code used to filter arrivals/departures (optional) -->
+            <label for="flight-iata">Airport (IATA):</label>
+            <input type="text" id="flight-iata" maxlength="4" placeholder="CMX" value="CMX" />
+
+            <!-- Optional flight number filter (e.g. UA5140) -->
+            <label for="flight-number">Flight#:</label>
+            <input type="text" id="flight-number" placeholder="e.g. UA5140" />
+
+            <!-- Optional date filter -->
+            <label for="flight-date">Date:</label>
+            <input type="date" id="flight-date" />
+
+            <!-- local mode avoids external API consumption and uses LOCAL_FLIGHTS.py -->
+            <label><input type="checkbox" id="use-local"> Use local test data</label>
+            <button id="flight-search">Search</button>
+        </div>
         <div id="flights">loading flights...</div>
-        <script src="flights.js"></script>
-        <script> window.addEventListener("DOMContentLoaded", load_flights); </script>
+        <script> window.addEventListener("DOMContentLoaded", () => {
+            const searchFn = () => {
+                const iataInput = document.getElementById('flight-iata').value.trim().toUpperCase();
+                const iata = iataInput || '';
+                const flight = document.getElementById('flight-number').value.trim().toUpperCase();
+                const date = document.getElementById('flight-date').value;
+                const local = document.getElementById('use-local').checked;
+                load_flights({iata, flight, date, local});
+            };
+
+            document.getElementById('flight-search').addEventListener('click', searchFn);
+            searchFn();
+
+            setInterval(searchFn, 60000);
+        }); </script>
 
         <h2>Weather</h2>
         <div id="weather">loading weather...</div>
+        <hr>
+        <h3>3-Day Forecast</h3>
+        <div id="forecast">loading forecast...</div>
+        <script src="{{ url_for('static', filename='js/weather.js') }}"></script>
 
 
-        <h2>Airport Webcam</h2>
-        <div id="webcam"></div>
-        <h3>Airport Webcam</h3>
-        <iframe 
-            src="https://www.houghtoncounty.org/" 
-            width="600" 
-            height="400" 
-            style="border:1px solid #ccc;" 
-            title="Houghton County Airport Webcam">
-        </iframe>
-`;
-</script>
+        <div id="webcam-section" class="webcam">
+            <h3>CMX Live Webcam</h3>
+            <div class="webcam-window">
+                <iframe 
+                    src="https://www.houghtoncounty.org/"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    scrolling="no">
+                </iframe>
+            </div>
+            <div class="cam-label">LIVE</div>
+        </div>
+
         <script src="{{ url_for('static', filename='js/main.js') }}"></script>
         
 
